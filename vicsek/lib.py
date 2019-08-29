@@ -8,7 +8,7 @@ def vecteur_vers_angle(v):
 	return atan2(y,x) # https://docs.python.org/3/library/math.html#math.atan2
 
 
-# generate random angle theta between -pi - pi
+# genérer un angle aléatoire entre -pi et pi
 def angle_aleatoire():		
 	theta = np.random.uniform(-pi,pi)
 	return theta

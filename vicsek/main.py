@@ -2,6 +2,59 @@
 import numpy as np
 from lib import *
 import sys
+import matplotlib.pyplot as plt
+
+# Génération des graphique en une fois
+def dessine_vecteur(coords, thetas):
+
+	# couleur aléatoire
+	couleurs = ["b", "g", "y", "m", "c", "pink", "purple", "seagreen",
+			"salmon", "orange", "paleturquoise", "midnightblue",
+			"crimson", "lavender"]
+
+	
+	for i,(x,y) in enumerate(coords):
+
+		c = couleurs[i % len(couleurs)]
+
+		# point	
+		plt.scatter(x,y,color=c,marker=".")
+
+		# queue
+		theta = thetas[i]
+		v = angle_vers_vecteur(theta)
+		x1 = x - (0.025 * v[0])
+		y1 = y - (0.025 * v[1])
+		plt.plot([x,x1], [y,y1], color=c)
+
+	return
+
+
+
+def sauvegarde_graphique(path, N, eta, r):
+
+	# axes de 0 à 1
+	plt.axis([0,1,0,1])
+
+	# supprime l'affichage des ticks
+	frame = plt.gca()
+	frame.axes.get_xaxis().set_ticks([])
+	frame.axes.get_yaxis().set_ticks([])
+
+	# titre 
+	plt.title("$\eta$ = " + str(eta) + " N = " + str(N) + " r = " + str(r))
+
+	# sauvegarde
+	plt.savefig(path)
+	plt.close()
+
+	# efface pour le prochain graph
+	plt.cla()
+
+	return
+
+# générer directement les graphiques
+gen_graph = int(sys.argv[4])
 
 # nombre de particule
 N = int(sys.argv[1])
@@ -9,7 +62,7 @@ N = int(sys.argv[1])
 # intensité du bruit
 eta = float(sys.argv[2])
 
-# neighbor radius
+# rayon dans lequel chercher des voisins
 r = float(sys.argv[3])
 
 
@@ -35,10 +88,16 @@ for i,theta in enumerate(thetas):
 
 while t < T:
 
-	print(t)
-	# save coordinates & corresponding thetas to text file
-	output = np.concatenate((particules,thetas),axis=1)
-	np.savetxt("coords/%.2f.txt" % t, output)
+	progress = round(t/T * 100)
+	sys.stdout.write("Progression: %d%%   \r" % (progress) )
+	sys.stdout.flush()
+	
+	if (gen_graph):
+		dessine_vecteur(particules, thetas)
+		sauvegarde_graphique("graph/%.2f.jpg" % t, N, eta, r)
+	else:
+		output = np.concatenate((particules,thetas),axis=1)
+		np.savetxt("coords/%.2f.txt" % t, output)
 
 
 	for i,(x,y) in enumerate(particules):

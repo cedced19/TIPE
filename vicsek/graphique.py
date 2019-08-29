@@ -31,7 +31,7 @@ def dessine_vecteur(coords, thetas):
 
 
 
-def sauvegarde_graphique(file, eta):
+def sauvegarde_graphique(file, N, eta, r):
 
 	# axes de 0 à 1
 	plt.axis([0,1,0,1])
@@ -42,7 +42,7 @@ def sauvegarde_graphique(file, eta):
 	frame.axes.get_yaxis().set_ticks([])
 
 	# titre 
-	plt.title("$\eta$ = %.2f" % eta)
+	plt.title("$\eta$ = " + str(eta) + " N = " + str(N) + " r = " + str(r))
 
 	# sauvegarde
 	plt.savefig("graph/%s.jpg" % file[7:-4])
@@ -54,7 +54,14 @@ def sauvegarde_graphique(file, eta):
 	return
 
 
+# nombre de particule
+N = int(sys.argv[1])
+
+# intensité du bruit
 eta = float(sys.argv[2])
+
+# rayon dans lequel chercher des voisins
+r = float(sys.argv[3])
 
 
 for file in glob.glob("coords/*.txt"):
@@ -64,4 +71,4 @@ for file in glob.glob("coords/*.txt"):
 	coords = mat[:,0:2]
 	thetas = mat[:,2]
 	dessine_vecteur(coords, thetas)
-	sauvegarde_graphique(file, eta)
+	sauvegarde_graphique(file, N, eta, r)

@@ -2,12 +2,13 @@
 
 Générer les coordonnées
 ```
-python3 main.py N eta rayon
+python3 main.py N eta rayon gen_graph
 ```
+où `gen_graph` prend la valeur 0 ou 1
 
 Générer les graphiques
 ```
-python3 main.py N eta rayon
+python3 graphique.py N eta rayon
 ```
 
 Générer un film

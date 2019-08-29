@@ -1,4 +1,5 @@
 vicsek/coords/*.txt
 vicsek/graph/*.jpg
+vicsek/graph/*.mp4
 vicsek/*.pyc
-vicsek/_pycache_/**/*
+vicsek/__pycache__/**/*
