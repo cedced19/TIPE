@@ -7,12 +7,14 @@ import os
 def compare (calculated, prec):
     filename = os.path.abspath('../y-cruncher/10K/pi-dec-chudnovsky.txt')
     f = open(filename, "r")
-    ref = f.read()
     test=True 
     calculated=str(calculated)
     i=0
     while test and i<prec:
-        if(calculated[i]!=ref[i]):
+        ref = f.read(1)
+        if (ref == '.'):
+            ref = f.read(1)
+        if(calculated[i]!=ref):
             test=False
         else:
             i+=1
