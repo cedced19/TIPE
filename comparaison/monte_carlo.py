@@ -1,6 +1,5 @@
 
-# Voir http://dictionnaire.sensagent.leparisien.fr/Aiguille%20de%20Buffon/fr-fr/
-# https://en.wikipedia.org/wiki/Pi#/media/File:Comparison_pi_infinite_series.svg
+# Voir https://fr.wikipedia.org/wiki/M%C3%A9thode_de_Monte-Carlo#D%C3%A9termination_de_la_valeur_de_%CF%80
 
 import numpy.random as rd
 from math import pi,cos
