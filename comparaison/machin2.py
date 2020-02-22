@@ -99,8 +99,6 @@ def hutton_euler(one):
     return 4*(2*arctan_euler(3, one) + arctan_euler(7, one))
 
 
-list_methods = ['machin','gauss','ferguson','hutton','machin_euler','gauss_euler','ferguson_euler','hutton_euler']
-
 def exec_method (name,n):
     '''
     Execute la méthode passée en paramètre et retourne le nombre de décimales `digits`, le temps d'execution `time`, et le nombre de décimales "juste" 
@@ -116,20 +114,36 @@ def exec_method (name,n):
 def lint_name(name):
     return name.capitalize().replace('_e', ' E')
 
-def graph(N):
-    fig, main_ax = plt.subplots()
-    main_ax.set_title('Méthodes de Machin et autres')
-    main_ax.set_xlabel('Nombre de décimales')
-    main_ax.set_ylabel('Temps de calcul')
+def graph(N,list_methods,log):
+    fig, ax1 = plt.subplots()
+    ax1.set_title('Méthodes de Machin et autres')
+    ax1.set_xlabel('Nombre de décimales')
+    ax1.set_ylabel('Temps de calcul')
     X = [ 10**i for i in range (1,N)]
+    if (log):
+        X = [ i for i in range (1,N)]
+        ax1.set_xlabel('log(Nombre de décimales)')
     for method in list_methods:
         time_list=[]
         for i in range (1,N):
             (digits,time,check)=exec_method(method,i)
             time_list.append(time)
-        plt.plot(X,time_list,'o-', label=lint_name(method))
-    plt.legend(loc='upper left')
+        ax1.plot(X,time_list,'o-', label=lint_name(method))
+    ax1.legend(loc='upper left')
     plt.savefig('machin2.png')
-    plt.show()
+    #plt.show()
 
-graph(5)
+
+
+
+list_methods_1 = ['machin','gauss','ferguson','hutton','machin_euler','gauss_euler','ferguson_euler','hutton_euler']
+graph(7, list_methods_1,True)
+
+
+
+#  https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.bar.html 
+#    fig, ax2 = plt.subplots()
+#    ind = np.arange(len(list_methods))
+#    plt.bar(ind, check_list)
+#    plt.xticks(ind, list_methods)
+#    plt.show()
