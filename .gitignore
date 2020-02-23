@@ -3,3 +3,4 @@ vicsek/graph/*.jpg
 vicsek/graph/*.mp4
 vicsek/*.pyc
 vicsek/__pycache__/**/*
+comparaison/test.py

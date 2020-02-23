@@ -98,6 +98,12 @@ def hutton(one):
 def hutton_euler(one):
     return 4*(2*arctan_euler(3, one) + arctan_euler(7, one))
 
+def takano(one):
+    return 4*(12*arctan(49, one) + 32*arctan(57, one) - 5*arctan(239, one) + 12*arctan(110443,one))
+
+def takano_euler(one):
+    return 4*(12*arctan_euler(49, one) + 32*arctan_euler(57, one) - 5*arctan_euler(239, one) + 12*arctan_euler(110443,one))
+
 
 def exec_method (name,n):
     '''
@@ -114,32 +120,68 @@ def exec_method (name,n):
 def lint_name(name):
     return name.capitalize().replace('_e', ' E')
 
+def exec_and_save_method (name,digits):
+    '''
+    Execute la méthode passée en paramètre et sauvegarde le temps d'execution `time`
+    '''
+    one = 10**digits
+    start=time()
+    pi=eval(name + '(' + str(one) +  ')')
+    stop=time()
+
+    dt=stop-start
+    # Création du dossier de sauvegarde
+    date=str(round(time()))
+    os.mkdir('tmp/'+date+'/')
+    Dict = {lint_name(name): dt} 
+    np.save('tmp/'+date+'/time_machin.npy', Dict)
+    
+    print('La méthode '+ lint_name(name) +' a été executé pour ' + str(digits) + ' décimales en ' + str(dt) + 's')
+    print('Nombre de décimales justes: ' + str(compare(pi,digits)))
+
 def graph(N,list_methods,log):
     fig, ax1 = plt.subplots()
     ax1.set_title('Méthodes de Machin et autres')
     ax1.set_xlabel('Nombre de décimales')
     ax1.set_ylabel('Temps de calcul')
-    X = [ 10**i for i in range (1,N)]
+    X = [ 10**i for i in range (1,N+1)]
+    # Choix de l'affichage en log 
     if (log):
-        X = [ i for i in range (1,N)]
+        X = [ i for i in range (1,N+1)]
         ax1.set_xlabel('log(Nombre de décimales)')
+
+    
+    Dict = {} # création du dictionnaire pour sauvegarder les résultats
     for method in list_methods:
         time_list=[]
-        for i in range (1,N):
-            (digits,time,check)=exec_method(method,i)
-            time_list.append(time)
-        ax1.plot(X,time_list,'o-', label=lint_name(method))
+        name=lint_name(method)
+        for i in range (1,N+1):
+            (digits,dt,check)=exec_method(method,i)
+            time_list.append(dt)
+        ax1.plot(X,time_list,'o-', label=name)
+        Dict[name]=time_list
+
     ax1.legend(loc='upper left')
-    plt.savefig('machin2.png')
-    #plt.show()
+
+    # Création du dossier de sauvegarde
+    date=str(round(time()))
+    os.mkdir('tmp/'+date+'/')
+    np.save('tmp/'+date+'/time_machin.npy', Dict) 
+    plt.savefig('tmp/'+date+'/machin.png')
 
 
 
 
 list_methods_1 = ['machin','gauss','ferguson','hutton','machin_euler','gauss_euler','ferguson_euler','hutton_euler']
-graph(7, list_methods_1,True)
+#graph(7, list_methods_1,True)
 
 
+list_methods_2 = ['machin','gauss', 'machin_euler','gauss_euler']
+#graph(5, list_methods_2,True)
+
+#graph(7,['gauss_euler'],True)
+
+#exec_and_save_method('machin_euler',10**4)
 
 #  https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.bar.html 
 #    fig, ax2 = plt.subplots()
