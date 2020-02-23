@@ -6,33 +6,12 @@ import threading
 
 
 # Gestion des threads
-
-Pam, Qam, Tam = None,None,None
-Pmb, Qmb, Tmb = None,None,None
+numThread=0
+threadId=0
+dictThread={}
 
 def pi_chudnovsky_bs(digits):
     cste = 640320**3 // 24
-    def bs_no_thread(a, b):
-        if b - a == 1:
-            if a == 0:
-                Pab = Qab = mpz(1)
-            else:
-                Pab = mpz((6*a-5)*(2*a-1)*(6*a-1))
-                Qab = mpz(a**3*cste)
-            Tab = Pab * (13591409 + 545140134*a) 
-            if a & 1:
-                Tab = -Tab
-        else:
-            m = (a + b) // 2
-
-            Pam, Qam, Tam = bs_no_thread(a, m)
-
-            Pmb, Qmb, Tmb = bs_no_thread(m, b)
-
-            Pab = Pam * Pmb
-            Qab = Qam * Qmb
-            Tab = Qmb * Tam + Pam * Tmb
-        return Pab, Qab, Tab
     def bs(a, b):
         if b - a == 1:
             if a == 0:
@@ -45,24 +24,42 @@ def pi_chudnovsky_bs(digits):
                 Tab = -Tab
         else:
             m = (a + b) // 2
+            global numThread
+            if (numThread <= 30):
+                numThread+=2
+                global threadId
+                
+                threadId+=1
+                firstThread=str(threadId)
+                def calc1(a,m):
+                    Pam, Qam, Tam = bs(a, m)
+                    global dictThread
+                    dictThread[firstThread]=(Pam, Qam, Tam)
+                p1 = threading.Thread(target=calc1, args=(a, m,))
+                p1.start()
 
-            def calc1(a,m):
-                global Pam 
-                global Qam
-                global Tam
-                Pam, Qam, Tam = bs_no_thread(a, m)
-            p1 = threading.Thread(target=calc1, args=(a, m,))
-            p1.start()
-            def calc2(m,b): 
-                global Pmb 
-                global Qmb
-                global Tmb
-                Pmb, Qmb, Tmb = bs_no_thread(m,b)
-            p2 = threading.Thread(target=calc2, args=(m, b,))
-            p2.start()
 
-            p1.join()
-            p2.join()
+                threadId+=1
+                secondThread=str(threadId)
+                def calc2(m,b): 
+                    Pmb, Qmb, Tmb = bs(m,b)
+                    global dictThread 
+                    dictThread[secondThread]=(Pmb, Qmb, Tmb)
+                p2 = threading.Thread(target=calc2, args=(m, b,))
+                p2.start()
+
+
+
+                p1.join()
+                p2.join()
+                Pam, Qam, Tam = dictThread[firstThread]
+                Pmb, Qmb, Tmb = dictThread[secondThread]
+                numThread-=2
+                del dictThread[firstThread]
+                del dictThread[secondThread]
+            else:
+                Pam, Qam, Tam = bs(a, m)
+                Pmb, Qmb, Tmb = bs(m, b)
 
             Pab = Pam * Pmb
             Qab = Qam * Qmb
@@ -104,3 +101,11 @@ if __name__ == "__main__":
                 print("Last 5 digits %05d OK" % last_five_digits)
             else:
                 print("Last 5 digits %05d wrong should be %05d" % (last_five_digits, check_digits[digits]))
+
+
+
+
+
+
+# threading.active_count() --> beaucoup trop long
+# https://medium.com/contentsquare-engineering-blog/multithreading-vs-multiprocessing-in-python-ece023ad55a
