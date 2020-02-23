@@ -9,21 +9,21 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-def compare (calculated, prec):
-    filename = os.path.abspath('../y-cruncher/10K/pi-dec-chudnovsky.txt')
-    f = open(filename, "r")
+
+filename = os.path.abspath('../y-cruncher/10K/pi-dec-chudnovsky.txt')
+f = open(filename, "r")
+ref=f.read().replace('.', '')
+f.close()
+
+def compare (i, calculated, prec):
     test=True 
     calculated=str(calculated)
-    i=0
     while test and i<prec:
-        ref = str(f.read(1))
-        if (ref == '.'):
-            ref = str(f.read(1))
-        if(calculated[i]!=ref):
+        if(calculated[i]!=ref[i]):
             test=False
         else:
             i+=1
-    f.close()
+    
     return i
 
 def sqrt(a,one):
@@ -43,16 +43,25 @@ def sqrt(a,one):
     return x
 
 
-def chudnovsky(one):
+def chudnovsky(one,digits):
+    print('Calcul des constantes')
+    start_cste=time()
     # Au rang k=0
     ak=one
     a_sum=ak
     b_sum=0
     cste=640320**3//24 # précalcul de la constante qui intervient dans le calcul de ak
-    
+    numerator = sqrt(10005,one)*one*426880
+    totalTime_cste = time()-start_cste
+    print('Calcul des constantes effectué')
+
     k=1
+
+    checked=0
+    start=time()
+    totalTime=0
     
-    while 1:
+    while True:
         ak*=-(6*k-5)*(2*k-1)*(6*k-1)
         ak//=(k**3)*cste
         if ak==0:
@@ -60,21 +69,25 @@ def chudnovsky(one):
         a_sum+=ak
         b_sum+=ak*k
         k+=1
+        dt=time()-start
+        totalTime+=dt
+        denominator = 13591409*a_sum + 545140134*b_sum
+        nChecked=compare(checked,numerator//denominator,digits)
+        print('Nombre de décimales justes: ' + str(checked) + '   ' + str(nChecked-checked)  +  ' décimales en ' + str(dt) + 's, temps total: ' + str(totalTime) + 's')
+        checked=nChecked
+        start=time()
+
     denominator = 13591409*a_sum + 545140134*b_sum 
-    numerator = sqrt(10005,one)*one*426880
-    return numerator//denominator
+    
+    return numerator//denominator,dt,checked,totalTime_cste
 
 def exec_and_save_method (digits):
     '''
     Execute la méthode passée en paramètre et sauvegarde le temps d'execution `time`
     '''
     one = 10**digits
-    start=time()
-    pi=chudnovsky(one)
-    stop=time()
+    pi,dt,correct,dt_cste=chudnovsky(one,digits)
 
-    dt=stop-start
-    correct=compare(pi,digits)
 
     # Création du dossier de sauvegarde
     date=str(round(time()))
@@ -83,8 +96,9 @@ def exec_and_save_method (digits):
     np.save('tmp/'+date+'/time_chudnovsky.npy', DictTime)
     DictCorrect = {'Chudnovsky test 1': correct} 
     np.save('tmp/'+date+'/correct_chudnovsky.npy', DictCorrect)
-    
+    print('====================================================================')
     print('Chudnovsky a été executé pour ' + str(digits) + ' décimales en ' + str(dt) + 's')
+    print('Temps de calcul des constantes: '+ str(dt_cste))
     print('Nombre de décimales justes: ' + str(correct))
 
-exec_and_save_method(10**7)
+exec_and_save_method(10**6)
